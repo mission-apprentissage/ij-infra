@@ -13,7 +13,7 @@ PRODUCT_DIR="${ROOT_DIR}/products/${PRODUCT_NAME}"
 
 function runPlaybook() {
   echo "Lancement du playbook ${PLAYBOOK_NAME} pour ${PRODUCT_NAME}-${ENV_FILTER}..."
-  
+
   local ansible_extra_opts=()
 
   export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
@@ -37,9 +37,10 @@ function runPlaybook() {
 
   # This env-vars is used by CI to decrypt
   if [[ -z "${ANSIBLE_VAULT_PASSWORD_FILE:-}" ]]; then
+    echo "Aucun ANSIBLE_VAULT_PASSWORD_FILE file trouvé, récupération par le script ${SCRIPT_DIR}/get-vault-password-client.sh"
     ansible_extra_opts+=("--vault-password-file" "${SCRIPT_DIR}/get-vault-password-client.sh")
   else
-    echo "Récupération de la passphrase depuis l'environnement variable ANSIBLE_VAULT_PASSWORD_FILE" 
+    echo "Récupération de la passphrase depuis l'environnement variable ANSIBLE_VAULT_PASSWORD_FILE"
   fi
 
   ANSIBLE_CONFIG="${ROOT_DIR}/.infra/ansible/ansible.cfg" ansible-playbook \

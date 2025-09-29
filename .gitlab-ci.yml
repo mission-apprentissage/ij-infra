@@ -1,0 +1,16 @@
+stages:
+  - setup
+
+variables:
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: "/certs"
+
+workflow:
+  rules:
+    # Pipeline merge requests
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    # Pipeline manuel avec inputs
+    - if: $CI_PIPELINE_SOURCE == "web"
+
+include:
+  - local: ".gitlab/ci/setup.yml"

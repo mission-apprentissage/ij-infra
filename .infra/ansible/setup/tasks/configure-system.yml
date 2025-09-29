@@ -30,7 +30,7 @@
   when: env_type == 'preview'
 
 - name: Docker login
-  shell: "echo $PASS | docker login -u '{{ vault.DOCKER_LOGIN.user }}' --password-stdin"
+  shell: "echo $PASS | docker login -u '{{ vault.DOCKER_LOGIN.user }}' registry.gitlab.forge.education.gouv.fr --password-stdin"
   environment:
     PASS: "{{ vault.DOCKER_LOGIN.token }}"
 

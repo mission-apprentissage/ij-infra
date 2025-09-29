@@ -1,0 +1,174 @@
+.setup_base:
+  stage: setup
+  image: alpine:latest
+  services:
+    - node:22
+  before_script:
+    - |
+      [ -z "$DEPLOY_PASS" ] && echo "DEPLOY_PASS is not set" && exit 1
+      [ -z "$DEPLOY_SSH_PRIVATE_KEY" ] && echo "DEPLOY_SSH_PRIVATE_KEY is not set" && exit 1
+    - apk add --no-cache openssh-client ansible bash sudo jq yq nodejs npm
+    - npm install -g yarn
+    - yarn set version classic
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - eval $(ssh-agent -s)
+    - echo "$DEPLOY_SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
+    - ssh-add ~/.ssh/id_rsa
+    - ssh-add -l
+    - echo "Private key added"
+    - echo "$VAULT_PWD" > .infra/.vault_pwd.txt
+    - echo pwd .infra/.vault_pwd.txt
+    - echo "Vault password file created"
+    - cp $HABILITATIONS ./products/orion/habilitations.yml
+    - chmod 600 ./products/orion/habilitations.yml
+    - cp $SSL_FULLCHAIN_NON_PROD ./products/orion/ssl/certificates/recette/fullchain.pem
+    - cp $SSL_PRIVKEY_NON_PROD ./products/orion/ssl/certificates/recette/privkey.pem
+    - cp $SSL_FULLCHAIN_PROD ./products/orion/ssl/certificates/production/fullchain.pem
+    - cp $SSL_PRIVKEY_PROD ./products/orion/ssl/certificates/production/privkey.pem
+    - chmod -R 644 ./products/orion/ssl/certificates/
+
+setup_qualification:
+  stage: setup
+  extends: .setup_base
+  allow_failure: true
+  variables:
+    ANSIBLE_VAULT_PASSWORD_FILE: .infra/.vault_pwd.txt
+    ANSIBLE_REMOTE_USER: deploy
+    ANSIBLE_BECOME_PASS: $DEPLOY_PASS
+    ENVIRONMENT: qualification
+    ANSIBLE_HOST_KEY_CHECKING: "False"
+    APP_TOKEN: $OVH_APP_TOKEN
+    APP_KEY: $OVH_APP_KEY
+    APP_SECRET: $OVH_APP_SECRET
+  before_script:
+    - !reference [.setup_base, before_script]
+    - ssh-keyscan -H 'qa.orion.education.gouv.fr' >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+    - echo "Testing SSH connection..."
+    - ssh -v -o StrictHostKeyChecking=no deploy@qa.orion.education.gouv.fr "echo 'SSH connection successful'" || echo "SSH test failed"
+  script:
+    - |
+      # Retrieve new version
+      echo "Setting $VERSION"
+      echo "Deployment to $ENVIRONMENT"
+    - echo $ANSIBLE_VAULT_PASSWORD_FILE
+    - cat $ANSIBLE_VAULT_PASSWORD_FILE
+    - .bin/infra system:setup orion qualification
+  environment:
+    name: qualification
+    deployment_tier: development
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: manual
+    - if: $CI_PIPELINE_SOURCE == "web"
+      when: manual
+
+setup_diffusion:
+  stage: setup
+  extends: .setup_base
+  allow_failure: true
+  variables:
+    ANSIBLE_VAULT_PASSWORD_FILE: .infra/.vault_pwd.txt
+    ANSIBLE_REMOTE_USER: deploy
+    ANSIBLE_BECOME_PASS: $DEPLOY_PASS
+    ENVIRONMENT: diffusion
+    ANSIBLE_HOST_KEY_CHECKING: "False"
+    APP_TOKEN: $OVH_APP_TOKEN
+    APP_KEY: $OVH_APP_KEY
+    APP_SECRET: $OVH_APP_SECRET
+  before_script:
+    - !reference [.setup_base, before_script]
+    - ssh-keyscan -H 'qp.orion.education.gouv.fr' >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+    - echo "Testing SSH connection..."
+    - ssh -v -o StrictHostKeyChecking=no deploy@qp.orion.education.gouv.fr "echo 'SSH connection successful'" || echo "SSH test failed"
+  script:
+    - |
+      # Retrieve new version
+      echo "Setting $VERSION"
+      echo "Deployment to $ENVIRONMENT"
+    - echo $ANSIBLE_VAULT_PASSWORD_FILE
+    - cat $ANSIBLE_VAULT_PASSWORD_FILE
+    - .bin/infra system:setup orion diffusion
+  environment:
+    name: diffusion
+    deployment_tier: development
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: manual
+    - if: $CI_PIPELINE_SOURCE == "web"
+      when: manual
+
+setup_preproduction:
+  stage: setup
+  extends: .setup_base
+  allow_failure: true
+  variables:
+    ANSIBLE_VAULT_PASSWORD_FILE: .infra/.vault_pwd.txt
+    ANSIBLE_REMOTE_USER: deploy
+    ANSIBLE_BECOME_PASS: $DEPLOY_PASS
+    ENVIRONMENT: preproduction
+    ANSIBLE_HOST_KEY_CHECKING: "False"
+    APP_TOKEN: $OVH_APP_TOKEN
+    APP_KEY: $OVH_APP_KEY
+    APP_SECRET: $OVH_APP_SECRET
+  before_script:
+    - !reference [.setup_base, before_script]
+    - ssh-keyscan -H 'pp.orion.education.gouv.fr' >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+    - echo "Testing SSH connection..."
+    - ssh -v -o StrictHostKeyChecking=no deploy@pp.orion.education.gouv.fr "echo 'SSH connection successful'" || echo "SSH test failed"
+  script:
+    - |
+      # Retrieve new version
+      echo "Setting $VERSION"
+      echo "Deployment to $ENVIRONMENT"
+    - echo $ANSIBLE_VAULT_PASSWORD_FILE
+    - cat $ANSIBLE_VAULT_PASSWORD_FILE
+    - .bin/infra system:setup orion preproduction
+  environment:
+    name: preproduction
+    deployment_tier: development
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: manual
+    - if: $CI_PIPELINE_SOURCE == "web"
+      when: manual
+
+setup_production:
+  stage: setup
+  extends: .setup_base
+  allow_failure: true
+  variables:
+    ANSIBLE_VAULT_PASSWORD_FILE: .infra/.vault_pwd.txt
+    ANSIBLE_REMOTE_USER: deploy
+    ANSIBLE_BECOME_PASS: $DEPLOY_PASS
+    ENVIRONMENT: production
+    ANSIBLE_HOST_KEY_CHECKING: "False"
+    APP_TOKEN: $OVH_APP_TOKEN
+    APP_KEY: $OVH_APP_KEY
+    APP_SECRET: $OVH_APP_SECRET
+  before_script:
+    - !reference [.setup_base, before_script]
+    - ssh-keyscan -H 'orion.education.gouv.fr' >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+    - echo "Testing SSH connection..."
+    - ssh -v -o StrictHostKeyChecking=no deploy@orion.education.gouv.fr "echo 'SSH connection successful'" || echo "SSH test failed"
+  script:
+    - |
+      # Retrieve new version
+      echo "Setting $VERSION"
+      echo "Deployment to $ENVIRONMENT"
+    - echo $ANSIBLE_VAULT_PASSWORD_FILE
+    - cat $ANSIBLE_VAULT_PASSWORD_FILE
+    - .bin/infra system:setup orion production
+  environment:
+    name: production
+    deployment_tier: development
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: manual
+    - if: $CI_PIPELINE_SOURCE == "web"
+      when: manual
