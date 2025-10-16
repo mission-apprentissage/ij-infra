@@ -6,7 +6,7 @@ readonly TAG_PREFIX=${1:?"Merci de préciser le directory (ex. reverse_proxy, fl
 shift
 readonly VERSION=$("${SCRIPT_DIR}/release/get-version.sh" $TAG_PREFIX)
 
-echo "Build & Push docker de $TAG_PREFIX sur le registry github (https://ghcr.io/mission-apprentissage/)"
+echo "Build & Push docker de $TAG_PREFIX sur le registry github (https://registry.gitlab.com/lucasdetre/transfert-orion)"
 
 get_channel() {
   local version="$1"
@@ -89,15 +89,15 @@ select_version() {
 NEXT_VERSION=$(select_version)
 
 echo -e '\n'
-read -p "Do you need to login to ghcr.io registry? [y/N]" RES_LOGIN
+read -p "Do you need to login to registry.gitlab.com registry? [y/N]" RES_LOGIN
 
 case $RES_LOGIN in
   [yY][eE][sS]|[yY])
-    read -p "[ghcr.io] user ? : " u
-    read -p "[ghcr.io] GH personnal token ? : " p
+    read -p "[registry.gitlab.com] user ? : " u
+    read -p "[registry.gitlab.com] GH personnal token ? : " p
 
     echo "Login sur le registry ..."
-    echo $p | docker login ghcr.io -u "$u" --password-stdin
+    echo $p | docker login registry.gitlab.com -u "$u" --password-stdin
     echo "Logged!"
     ;;
 esac
@@ -109,9 +109,9 @@ set -e
 echo "Building $TAG_PREFIX:$NEXT_VERSION ..."
 docker buildx build "$ROOT_DIR/$TAG_PREFIX" \
       --platform linux/amd64,linux/arm64 \
-      --tag ghcr.io/mission-apprentissage/ij_$TAG_PREFIX:"$NEXT_VERSION" \
-      --tag ghcr.io/mission-apprentissage/ij_$TAG_PREFIX:$(get_channel $NEXT_VERSION) \
-      --label "org.opencontainers.image.source=https://github.com/mission-apprentissage/ij-infra" \
+      --tag registry.gitlab.com/lucasdetre/transfert-infra-orion/ij_$TAG_PREFIX:"$NEXT_VERSION" \
+      --tag registry.gitlab.com/lucasdetre/transfert-infra-orion/ij_$TAG_PREFIX:$(get_channel $NEXT_VERSION) \
+      --label "org.opencontainers.image.source=https://registry.gitlab.com/lucasdetre/transfert-infra-orion" \
       --label "org.opencontainers.image.description=$TAG_PREFIX InserJeunes" \
       --label "org.opencontainers.image.version=$NEXT_VERSION" \
       --label "org.opencontainers.image.licenses=MIT" \
