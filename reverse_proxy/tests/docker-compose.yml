@@ -5,7 +5,7 @@ version: "3.8"
 
 services:
   reverse_proxy:
-    image: registry.gitlab.forge.education.gouv.fr/ORION_OutilTransfoCartePro/Infra/ij_reverse_proxy:0.0.7-beta.1
+    image: harbor.forge.education.gouv.fr/orion-orion/ij_reverse_proxy:0.0.7-beta.1
     ports:
       - target: 80
         published: 80

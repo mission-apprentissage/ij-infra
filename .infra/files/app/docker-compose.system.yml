@@ -26,7 +26,7 @@ x-default: &default
 services:
   reverse_proxy:
     <<: *default
-    image: registry.gitlab.forge.education.gouv.fr/ORION_OutilTransfoCartePro/Infra/ij_reverse_proxy:{{reverse_proxy_version}}
+    image: harbor.forge.education.gouv.fr/orion-orion/ij_reverse_proxy:{{reverse_proxy_version}}
     deploy:
       <<: *deploy-default
       restart_policy:
@@ -131,7 +131,7 @@ services:
       resources:
         limits:
           cpus: "1.00"
-    image: registry.gitlab.forge.education.gouv.fr/ORION_OutilTransfoCartePro/Infra/ij_fluentd:{{fluentd_version}}
+    image: harbor.forge.education.gouv.fr/orion-orion/ij_fluentd:{{fluentd_version}}
     ports:
       - "24224:24224"
       - "24224:24224/udp"

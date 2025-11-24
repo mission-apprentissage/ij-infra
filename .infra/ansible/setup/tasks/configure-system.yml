@@ -30,9 +30,9 @@
   when: env_type == 'preview'
 
 - name: Docker login
-  shell: "echo $PASS | docker login -u '{{ vault.DOCKER_LOGIN.user }}' registry.gitlab.forge.education.gouv.fr --password-stdin"
+  shell: "echo $PASS | docker login -u '{{ vault.HARBOR_LOGIN.user }}' harbor.forge.education.gouv.fr --password-stdin"
   environment:
-    PASS: "{{ vault.DOCKER_LOGIN.token }}"
+    PASS: "{{ vault.HARBOR_LOGIN.password }}"
 
 - include_role:
     name: patrickjahns.promtail

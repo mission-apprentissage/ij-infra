@@ -6,7 +6,7 @@ readonly TAG_PREFIX=${1:?"Merci de préciser le directory (ex. reverse_proxy, fl
 shift
 readonly VERSION=$("${SCRIPT_DIR}/release/get-version.sh" $TAG_PREFIX)
 
-echo "Build & Push docker de $TAG_PREFIX sur le registry github (https://registry.gitlab.forge.education.gouv.fr/ORION_OutilTransfoCartePro/Orion)"
+echo "Build & Push docker de $TAG_PREFIX sur le registry harbor (https://harbor.forge.education.gouv.fr/ORION_OutilTransfoCartePro/Orion)"
 
 get_channel() {
   local version="$1"
@@ -89,15 +89,15 @@ select_version() {
 NEXT_VERSION=$(select_version)
 
 echo -e '\n'
-read -p "Do you need to login to registry.gitlab.com registry? [y/N]" RES_LOGIN
+read -p "Do you need to login to harbor registry? [y/N]" RES_LOGIN
 
 case $RES_LOGIN in
   [yY][eE][sS]|[yY])
-    read -p "[registry.gitlab.forge.education.gouv.fr] user ? : " u
-    read -p "[registry.gitlab.forge.education.gouv.fr] GH personnal token ? : " p
+    read -p "[harbor] user ? : " u
+    read -p "[harbor] GH personnal token ? : " p
 
     echo "Login sur le registry ..."
-    echo $p | docker login registry.gitlab.forge.education.gouv.fr -u "$u" --password-stdin
+    echo $p | docker login harbor.forge.education.gouv.fr -u "$u" --password-stdin
     echo "Logged!"
     ;;
 esac
@@ -109,9 +109,9 @@ set -e
 echo "Building $TAG_PREFIX:$NEXT_VERSION ..."
 docker buildx build "$ROOT_DIR/$TAG_PREFIX" \
       --platform linux/amd64,linux/arm64 \
-      --tag registry.gitlab.forge.education.gouv.fr/ORION_OutilTransfoCartePro/Infra/ij_$TAG_PREFIX:"$NEXT_VERSION" \
-      --tag registry.gitlab.forge.education.gouv.fr/ORION_OutilTransfoCartePro/Infra/ij_$TAG_PREFIX:$(get_channel $NEXT_VERSION) \
-      --label "org.opencontainers.image.source=https://registry.gitlab.forge.education.gouv.fr/ORION_OutilTransfoCartePro/Infra/ij_$TAG_PREFIX" \
+      --tag harbor.forge.education.gouv.fr/orion-orion/ij_$TAG_PREFIX:"$NEXT_VERSION" \
+      --tag harbor.forge.education.gouv.fr/orion-orion/ij_$TAG_PREFIX:$(get_channel $NEXT_VERSION) \
+      --label "org.opencontainers.image.source=https://harbor.forge.education.gouv.fr/orion-orion/ij_$TAG_PREFIX" \
       --label "org.opencontainers.image.description=$TAG_PREFIX InserJeunes" \
       --label "org.opencontainers.image.version=$NEXT_VERSION" \
       --label "org.opencontainers.image.licenses=MIT" \
