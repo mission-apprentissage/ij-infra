@@ -167,3 +167,4 @@ node_modules.tar.gz
 /.env_server
 vault-tmp-*.*
 id_rsa_deploy.key
+.vault-password-previous.gpg
