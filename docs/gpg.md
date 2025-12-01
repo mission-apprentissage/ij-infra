@@ -25,7 +25,7 @@ Voici les étapes pour créer votre clé GPG :
 3. Pour utiliser votre clé au sein de la mission apprentissage, vous devez la publier en exécutant la commande suivante :
 
    ```bash
-   gpg --send-key <identifiant>
+   gpg --send-key <identifiant> --keyserver keyserver.ubuntu.com
    ```
 
 4. Pour une meilleure sécurité, il est recommandé de sauvegarder les clés publique et privée nouvellement créées. Vous pouvez les exporter en exécutant les commandes suivantes :
