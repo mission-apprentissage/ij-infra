@@ -39,3 +39,6 @@
 
 - import_tasks: configure-swap.yml
   tags: swap
+
+- import_tasks: configure-zabbix.yml
+  tags: zabbix

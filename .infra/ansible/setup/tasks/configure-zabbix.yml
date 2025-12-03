@@ -1,0 +1,44 @@
+- name: Définir dynamiquement la clé PSK en fonction de l'environnement
+  ansible.builtin.set_fact:
+    zabbix_agent_psk_key: "{{ vault.psk_keys_by_env[env_type] }}"
+
+- name: Définir dynamiquement la clé PSK en fonction de l'environnement
+  ansible.builtin.set_fact:
+    zabbix_psk_identity: "{{ vault.zabbix_agent_psk_identity_by_env[env_type] }}"
+
+- name: Téléchargement et installation du package de dépôt Zabbix
+  ansible.builtin.apt:
+    deb: "https://repo.zabbix.com/zabbix/6.4/ubuntu/pool/main/z/zabbix-release/zabbix-release_6.4-1+ubuntu$(lsb_release -rs)_all.deb"
+    state: present
+    update_cache: yes
+  register: zabbix_repo_install
+  notify: Mettre à jour le cache APT
+
+- name: Installation de l'agent Zabbix 2
+  ansible.builtin.apt:
+    name: zabbix-agent2
+    state: present
+    update_cache: yes
+
+- name: Configuration de l'agent Zabbix
+  ansible.builtin.template:
+    src: "{{playbook_dir}}/../files/zabbix/zabbix_agent2.conf.j2"
+    dest: /etc/zabbix/zabbix_agent2.conf
+    owner: zabbix
+    group: zabbix
+    mode: '0644'
+  notify: Redémarrer l'agent Zabbix
+
+- name: Copie du fichier de clé PSK secret (zabbix_agentd.psk)
+  ansible.builtin.copy:
+    src: "{{playbook_dir}}/../files/zabbix/zabbix_agentd.psk.j2"
+    dest: /etc/zabbix/zabbix_agentd.psk
+    owner: zabbix
+    group: zabbix
+    mode: '0600'
+
+- name: 5. Assurer que l'agent Zabbix est démarré et activé au démarrage
+  ansible.builtin.service:
+    name: zabbix-agent2
+    state: started
+    enabled: yes
