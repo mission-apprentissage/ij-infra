@@ -57,3 +57,23 @@ bash ./setup/scripts/vault/update-product-access.sh <product_name>
 echo standard-resolver >> $HOME/.gnupg/dirmngr.conf;
 pkill dirmngr
 ```
+
+Une fois le fichier d'habilitations modifié, il faut regénerer un vault et un vault-password associé pour les deux repo `ij-infra` et `tjp-pilotage` :
+
+### ij-infra
+
+- `./.bin/infra vault:renew`
+- vérifier que ça fonctionne : `./.bin/infra vault:show`
+- récupérer le mot de passe : `./.bin/infra vault:password`
+- le copier/coller dans le secret VAULT_PWD sur github/gitlab
+- commit et push
+- stocker les fichiers `.vault-password.gpg`, `vault-password-previous.gpg`, `habilitations.yml`, `vault.yml` (1password)
+
+### tjp-pilotage
+
+- `./.bin/product vault:renew`
+- vérifier que ça fonctionne : `./.bin/infra vault:show`
+- récupérer le mot de passe : `./.bin/product vault:edit`
+- le copier/coller dans le secret VAULT_PWD sur github/gitlab
+- commit et push
+- stocker les fichiers `.vault-password.gpg`, `vault-password-previous.gpg`, `habilitations.yml`, `vault.yml` (1password)
