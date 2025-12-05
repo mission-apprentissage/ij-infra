@@ -1,6 +1,9 @@
 - import_tasks: configure-system.yml
   tags: system
 
+- import_tasks: configure-zabbix.yml
+  tags: zabbix
+
 - import_tasks: configure-dns.yml
   tags: dns
 
@@ -39,3 +42,4 @@
 
 - import_tasks: configure-swap.yml
   tags: swap
+

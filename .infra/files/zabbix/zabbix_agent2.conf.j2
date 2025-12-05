@@ -1,0 +1,14 @@
+PidFile=/run/zabbix/zabbix_agent2.pid
+LogFile=/var/log/zabbix/zabbix_agent2.log
+LogFileSize=0
+Server={{ vault.zabbix_server }}
+ServerActive={{ vault.zabbix_server }}
+Hostname={{ host_name }}
+PluginSocket=/run/zabbix/agent.plugin.sock
+ControlSocket=/run/zabbix/agent.sock
+TLSConnect=psk
+TLSAccept=psk
+TLSPSKIdentity={{ zabbix_psk_identity }}
+TLSPSKFile=/etc/zabbix/zabbix_agentd.psk
+Include=/etc/zabbix/zabbix_agent2.d/plugins.d/*.conf
+Include=/etc/zabbix/zabbix_agent2.d/plugins.d/*.conf
