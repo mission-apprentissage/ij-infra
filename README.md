@@ -1,3 +1,5 @@
+[PROJET ARCHIVÉ SUITE À LA PASSATION DE L'APPLICATION AU MINISTÈRE DE L'ÉDUCATION NATIONALE LE 31/12/2025]
+
 # Configuration Serveurs - InserJeunes
 
 Le dépot contient la configuration de base des serveurs d'inserJeunes ainsi que les images dockers personnalisées.
